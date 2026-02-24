@@ -112,7 +112,7 @@
             <h2 style="font-size: 3rem; margin: 0; color: #000;">The Deal is In! 🤝</h2>
             <p style="font-size: 1.5rem; font-weight: bold;">You got <span id="score-text" style="color: var(--gold); font-size: 2rem;">0</span> out of 10 correct.</p>
             
-            <div class="discount-badge" id="discount-text">0% OFF</div>
+            <div class="discount-badge" id="discount-text">0 Rs OFF</div>
             <p style="font-size: 1.2rem; font-weight: 600; color: #555;">Your "Finance Carnival" discount rate has been calculated.</p>
             
             <button class="action-btn" style="background: #444; margin-top: 20px;" onclick="toggleReview()">Show My Answers (Indirectly)</button>
@@ -290,7 +290,7 @@
         const discount = Math.floor(score / 2) * 5;
         
         document.getElementById('score-text').innerText = score;
-        document.getElementById('discount-text').innerText = `Rs. ${discount} OFF`;
+        document.getElementById('discount-text').innerText = `${discount} Rs. OFF`;
         
         // Prepare the "Indirect" Review Section
         const reviewBox = document.getElementById('review-box');
@@ -322,3 +322,4 @@
 
 </body>
 </html>
+
