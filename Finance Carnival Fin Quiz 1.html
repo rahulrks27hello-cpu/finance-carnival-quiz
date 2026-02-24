@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Carnival 2026 - CBT</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #000000;
+            --success: #27ae60;
+            --text-main: #111111;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            margin: 0; padding: 0; 
+            background-image: url('Background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* HEADER SECTION - Dark background to blend the black logos */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.95); padding: 15px 40px; 
+            border-bottom: 5px solid var(--gold);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        header img { max-height: 85px; width: auto; object-fit: contain; }
+        .logo-box { flex: 1; display: flex; align-items: center; }
+        .center { justify-content: center; } .right { justify-content: flex-end; }
+
+        /* MAIN CONTAINER - Sits within the background's white box */
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container { 
+            width: 100%; max-width: 900px; 
+            background: rgba(255, 255, 255, 0.96); /* Ensures text is STRICTLY visible */
+            padding: 50px; border-radius: 20px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            border: 4px solid var(--gold);
+        }
+        
+        /* BIG AND BOLD TEXT */
+        .tracker { font-weight: 800; color: #b8860b; text-transform: uppercase; margin-bottom: 20px; font-size: 1.1rem; }
+        .question-text { font-size: 2.1rem; font-weight: 900; line-height: 1.3; margin-bottom: 40px; color: #000; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .option-btn {
+            background: #ffffff; border: 3px solid #d1d5db; padding: 22px;
+            border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: 700; text-align: left;
+            transition: all 0.2s; color: #333;
+        }
+        .option-btn:hover { border-color: var(--gold); background: #fffdf5; transform: scale(1.02); }
+        .option-btn.selected { background: var(--gold); color: #000; border-color: #b8860b; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+
+        .footer { margin-top: 40px; display: flex; justify-content: flex-end; }
+        .action-btn { background: var(--dark); color: white; padding: 18px 50px; border: none; border-radius: 12px; font-size: 1.4rem; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .action-btn:hover { background: #333; }
+        
+        /* RESULT SECTION */
+        #result-view { display: none; text-align: center; }
+        .discount-badge { font-size: 5rem; color: var(--success); font-weight: 900; margin: 15px 0; text-shadow: 2px 2px 0px #fff; }
+        .review-section { display: none; text-align: left; margin-top: 40px; border-top: 3px solid #eee; padding-top: 20px; max-height: 400px; overflow-y: auto; }
+        .review-item { margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 5px solid #ccc; font-size: 1.1rem; }
+        .review-item.correct { border-left-color: var(--success); }
+        .review-item.wrong { border-left-color: #e74c3c; }
+        .correct-ans { color: var(--success); font-weight: 900; }
+        .user-ans { font-weight: bold; color: #555; }
+
+        @media (max-width: 768px) {
+            header { padding: 10px; }
+            header img { max-height: 50px; }
+            .options-grid { grid-template-columns: 1fr; }
+            .question-text { font-size: 1.6rem; }
+            .container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-box"><img src="AdVITya 2026 Logo.png" alt="Advitya 2026"></div>
+    <div class="logo-box center"><img src="Finance Carnival Logo.png" alt="Finance Carnival"></div>
+    <div class="logo-box right"><img src="Copy of TFC Logo v3.2.png" alt="Fintech Club"></div>
+</header>
+
+<div class="wrapper">
+    <div class="container">
+        <div id="quiz-view">
+            <div class="tracker">Assessment: Question <span id="q-num">1</span> of 10</div>
+            <div id="q-text" class="question-text">Syncing with the Vault...</div>
+            <div id="options" class="options-grid"></div>
+            <div class="footer">
+                <button id="next-btn" class="action-btn" onclick="nextQ()">Next ➔</button>
+                <button id="submit-btn" class="action-btn" style="display:none; background: var(--success);" onclick="calculateResults()">Submit Attempt</button>
+            </div>
+        </div>
+
+        <div id="result-view">
+            <h2 style="font-size: 3rem; margin: 0; color: #000;">The Deal is In! 🤝</h2>
+            <p style="font-size: 1.5rem; font-weight: bold;">You got <span id="score-text" style="color: var(--gold); font-size: 2rem;">0</span> out of 10 correct.</p>
+            
+            <div class="discount-badge" id="discount-text">0% OFF</div>
+            <p style="font-size: 1.2rem; font-weight: 600; color: #555;">Your "Finance Carnival" discount rate has been calculated.</p>
+            
+            <button class="action-btn" style="background: #444; margin-top: 20px;" onclick="toggleReview()">Show My Answers (Indirectly)</button>
+            <button class="action-btn" style="background: var(--gold); color: #000; margin-top: 20px; margin-left: 10px;" onclick="location.reload()">Re-roll the Dice</button>
+
+            <div id="review-box" class="review-section"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FULL 100 QUESTION DATABASE - WITH 100% ACCURATE 'c' (Correct Answer Index 0-3)
+    const database = [
+        { q: "An entrepreneur pitches a 'smart belly button shaper.' Ashneer Grover looks at you and says:", a: ["Bohot aesthetic hai", "Yeh sab doglapan hai", "I'm in, no cap", "Ismein expertise hai meri"], c: 1 },
+        { q: "Aman Gupta says 'Hum bhi bana lenge'. What does he actually mean about your business?", a: ["You're a visionary", "You have no 'Moat' (Easy to copy)", "He wants a job", "It's very demure"], c: 1 },
+        { q: "Namita Thapar says 'I'm out' because she doesn't have expertise. Where is she likely from?", a: ["Mumbai", "Delhi", "Pune", "Bangalore"], c: 2 },
+        { q: "Anupam Mittal starts talking about 'TAM, SAM, and SOM.' What is he actually looking for?", a: ["Total Market Size", "New Instagram filters", "His next acting role", "The nearest exit"], c: 0 },
+        { q: "Peyush Bansal offers you a deal but wants you to use his tech. What's the trade-off?", a: ["Infinite Aura Points", "Equity", "A free pair of glasses", "His Netflix password"], c: 1 },
+        { q: "Vineeta Singh asks about your 'Burn Rate.' What is she worried about?", a: ["How fast you spend cash", "How many calories you burn", "Your sunscreen SPF", "Your coffee addiction"], c: 0 },
+        { q: "Deepinder Goyal joins the Tank and checks 'Unit Economics.' What is he checking?", a: ["If you deliver food", "Profit per single item sold", "Your Zomato Gold status", "If you're 'Cooking'"], c: 1 },
+        { q: "Ritesh Agarwal offers you a 'Founder Friendly' deal. What does he want to see?", a: ["Your LinkedIn Rizz", "Your struggle story", "Scalability", "Your OYO room history"], c: 2 },
+        { q: "If a Shark says 'Equity 5% for 50 Lakhs,' what is your company's valuation?", a: ["5 Crores", "10 Crores", "50 Lakhs", "Infinite"], c: 1 },
+        { q: "Lori Greiner calls your product a 'Hero.' What does that mean?", a: ["It's a Marvel movie", "It will sell millions", "It needs a cape", "It's a flop"], c: 1 },
+        { q: "You spent your entire rent on 2026 Oasis Reunion tickets. What is this called?", a: ["Value Investing", "Doom Spending", "Diversification", "Equity Funding"], c: 1 },
+        { q: "What is 'Girl Math' in a startup context?", a: ["Accurate Accounting", "Justifying a $1M burn as 'free money'", "High ROI", "ESG Reporting"], c: 1 },
+        { q: "Your startup has 1M followers on TikTok but $0 revenue. Valuation?", a: ["$100 Million", "10,000 Aura Points", "Seed Round Vibes", "Market Cap of a Potato"], c: 3 },
+        { q: "You use 'Loud Budgeting' to tell your friends you can't go to Goa. What are you doing?", a: ["Being broke", "Vocal about financial boundaries", "Ghosting them", "Gatekeeping funds"], c: 1 },
+        { q: "What does 'Buying the Dip' mean in Gen Z stock market terms?", a: ["Getting nachos for the pitch", "Purchasing after a price drop", "Selling everything", "Joining a cult"], c: 1 },
+        { q: "If your portfolio is 'Ghosting' you, what is happening?", a: ["It's growing fast", "Values are dropping/stagnant", "You deleted the app", "You're a millionaire"], c: 1 },
+        { q: "A 'Bull Market' is currently happening. What's the vibe?", a: ["The market is 'Cooking'", "The market is 'Capping'", "Bare Minimum Monday", "Everything is Mid"], c: 0 },
+        { q: "What is a 'Side Hustle' that turned into a 'Main Character'?", a: ["A hobby that became a Unicorn", "A 9-5 job", "An internship", "A gym membership"], c: 0 },
+        { q: "You have 'Diamond Hands' in crypto. This means:", a: ["You have expensive rings", "You never sell, even if it crashes", "You have 'Paper Hands'", "You're a jeweler"], c: 1 },
+        { q: "What is 'Financial Healing'?", a: ["A spa day", "Recovering from a bad investment", "Using a credit card", "Buying a lottery ticket"], c: 1 },
+        { q: "Your CEO says the company needs more 'Synergy.' What is he actually asking for?", a: ["Free Pizza", "More teamwork", "Everyone to work on Sunday", "A new logo"], c: 1 },
+        { q: "What is a 'Unicorn' startup?", a: ["A company that sells glitter", "A company valued at $1 Billion", "A startup with 1 employee", "A mythical beast"], c: 1 },
+        { q: "You are 'Pivoting' your business. What are you doing?", a: ["Spinning in circles", "Changing the business model", "Closing the company", "Hiring an influencer"], c: 1 },
+        { q: "What is a 'Pitch Deck'?", a: ["A literal deck of cards", "A presentation for investors", "A place to play cricket", "A skateboard trick"], c: 1 },
+        { q: "If you are 'Bootstrapping', how are you funding your startup?", a: ["Selling your shoes", "Your own personal savings", "A bank robbery", "Winning Shark Tank"], c: 1 },
+        { q: "What is 'FOMO' in the stock market?", a: ["Fear of Missing Out on a pump", "Fear of Making Orders", "Finding Only Money Options", "Fast Office Money Only"], c: 0 },
+        { q: "A 'Zebra' startup is different from a 'Unicorn' because it is:", a: ["Striped", "Sustainable and profitable", "Fake", "Only found in Africa"], c: 1 },
+        { q: "What is a 'Vulture Capitalist'?", a: ["An investor who takes over failing firms", "A VC who loves birds", "A friendly angel", "A bird-watching club"], c: 0 },
+        { q: "Your startup is in 'Stealth Mode.' What does this mean?", a: ["You're keeping the idea secret", "You are a ninja", "You have no office", "You are invisible to taxes"], c: 0 },
+        { q: "What is an 'Angel Investor'?", a: ["Someone who gives early-stage cash", "A rich person with wings", "A religious figure", "A charity worker"], c: 0 },
+        { q: "What is 'Compound Interest'?", a: ["Interest on interest", "Interest that is interesting", "A complex math exam", "A bank's way of saying sorry"], c: 0 },
+        { q: "What is an 'IPO'?", a: ["Going Public", "Initial Pizza Order", "I'm Pretty Over-it", "Inner Peace Only"], c: 0 },
+        { q: "What is 'Net Profit'?", a: ["What's left after all expenses", "Money you catch in a net", "Your total salary", "A tennis score"], c: 0 },
+        { q: "If you have 'Liquidity', what do you have?", a: ["Cash ready to spend", "A lot of water", "A leaky roof", "A juice business"], c: 0 },
+        { q: "What is a 'Blue Chip' stock?", a: ["A reliable, big-name company", "A stock from a casino", "A crypto meme coin", "A snack brand"], c: 0 },
+        { q: "What is 'Inflation'?", a: ["Prices going up over time", "Blowing up a balloon", "Your ego after a raise", "A tire problem"], c: 0 },
+        { q: "What is a 'Portfolio'?", a: ["A collection of investments", "A fancy briefcase", "A photography book", "A list of exes"], c: 0 },
+        { q: "What is a 'Dividend'?", a: ["A 'Thank You' payment from a company", "A math problem", "A breakup", "A tax penalty"], c: 0 },
+        { q: "What is 'Shorting' a stock?", a: ["Betting that the price will fall", "Buying a small amount", "Selling to a short person", "Ignoring the market"], c: 0 },
+        { q: "What is 'Diversification'?", a: ["Not putting all eggs in one basket", "Buying 100 different cryptos", "Changing your career", "Moving to a new city"], c: 0 },
+        { q: "Your AI influencer startup just got $5M. Biggest risk?", a: ["Humans becoming cool again", "Electricity bills", "It gains consciousness", "The AI gets 'cancelled'"], c: 3 },
+        { q: "In 2026, what is the 'New Gold'?", a: ["Data and Aura Points", "Actual Gold", "Used GPUs", "Water"], c: 0 },
+        { q: "You're 'Soft Saving' for retirement. What is the plan?", a: ["Prioritizing vibes now, saving later", "Saving 1 rupee a year", "Using a soft piggy bank", "Only buying bread"], c: 0 },
+        { q: "What is a 'Ghost Kitchen'?", a: ["A restaurant with no dining area", "A kitchen for spirits", "A failed startup", "A scary movie set"], c: 0 },
+        { q: "Your startup uses 'Web3' but no one knows what it is. You are:", a: ["A typical tech founder", "A visionary", "A marketing genius", "Confused"], c: 0 },
+        { q: "What is 'Sustainable Finance'?", a: ["Investing in eco-friendly stuff", "Money that lasts forever", "Living on 100 rupees", "Recycling coins"], c: 0 },
+        { q: "If you're 'Hustle Culture' tired, the 2026 solution is:", a: ["All of the above", "Quiet Quitting", "Bare Minimum Mondays", "A 3-day work week"], c: 0 },
+        { q: "Disrupting the sleep industry. What are you selling?", a: ["Smart Pillows with AI", "Coffee", "Alarm clocks that yell", "Better dreams"], c: 0 },
+        { q: "What is a 'Decacorn'?", a: ["A company worth $10 Billion", "A 10-headed horse", "A startup with 10 CEOs", "A corn field"], c: 0 },
+        { q: "Why is 'Context' the most important metric in 2026?", a: ["To avoid being 'Ratioed' on X", "It's not, it's revenue", "To look smart", "For better SEO"], c: 0 },
+        { q: "When a Shark says 'I'm out,' but asks a question:", a: ["FOMO is kicking in", "They are bored", "They lost their notes", "They want free samples"], c: 0 },
+        { q: "Aman Gupta wears his headphones during a pitch:", a: ["It's a branding move", "He's listening to music", "He's ghosting the founder", "He's calling Ashneer"], c: 0 },
+        { q: "Namita Thapar says 'Ismein meri expertise nahi hai.'", a: ["Say 'Thank you, next'", "Argue with her", "Cry", "Explain it like she's five"], c: 0 },
+        { q: "Peyush Bansal looks at his tablet. What is he doing?", a: ["Calculating your doom", "Playing Candy Crush", "Checking his Instagram", "Ordering OYO"], c: 0 },
+        { q: "Anupam Mittal talks about 'Brand Equity.'", a: ["The value of the brand name", "The logo's color", "His own fame", "Free T-shirts"], c: 0 },
+        { q: "Vineeta Singh tests your product and it breaks.", a: ["A 'Zero' moment", "Product-Market Mismatch", "Bad Luck", "Quality Control issues"], c: 0 },
+        { q: "A Shark asks for 10% Equity for 1 Rupee.", a: ["Savage Shark move", "Great deal", "Mistake", "Charity"], c: 0 },
+        { q: "What is a 'Debt' deal in the Tank?", a: ["A loan you have to pay back", "Free money", "A death sentence", "A gift"], c: 0 },
+        { q: "If all Sharks say 'I'm out,' what is that called?", a: ["A reality check", "A clean sweep", "A blackout", "A lunch break"], c: 0 },
+        { q: "Which Shark is most likely to ask about 'Packaging'?", a: ["Vineeta Singh", "Aman Gupta", "Namita Thapar", "Anupam Mittal"], c: 0 },
+        { q: "What is 'Cash Flow'?", a: ["Money moving in and out", "A rapper's name", "A river of coins", "How fast you spend in a club"], c: 0 },
+        { q: "What is a 'Bear Market'?", a: ["When stock prices are falling", "A market for teddy bears", "A forest", "A boring party"], c: 0 },
+        { q: "What is 'ROI'?", a: ["Return on Investment", "Risk of Insanity", "Running Out of Interest", "Really Old Idea"], c: 0 },
+        { q: "What is a 'Credit Score'?", a: ["A number that shows your trust", "A video game high score", "How much money you have", "Your popularity on X"], c: 0 },
+        { q: "What is 'Equity'?", a: ["Ownership in a company", "A type of horse", "Equal height for all", "A new makeup brand"], c: 0 },
+        { q: "What is a 'Bull'?", a: ["An investor who thinks prices go up", "An animal in Spain", "A loud person", "A type of energy drink"], c: 0 },
+        { q: "What is 'Venture Capital'?", a: ["Money for risky startups", "Capital city of a country", "Money for vacations", "A new clothing line"], c: 0 },
+        { q: "What is an 'Angel'?", a: ["An early-stage investor", "A very nice person", "A Victoria's Secret model", "A startup founder"], c: 0 },
+        { q: "What is 'Burn Rate'?", a: ["How fast a startup loses money", "How fast a candle burns", "Sunburn speed", "Spicy food tolerance"], c: 0 },
+        { q: "What is a 'Seed Round'?", a: ["The first major round of funding", "A gardening competition", "A bird feeding session", "The start of a game"], c: 0 },
+        { q: "If your startup was a Netflix show, 'Burn Rate' would be?", a: ["The production budget", "The plot twist", "The cliffhanger", "The cancellation"], c: 0 },
+        { q: "Which 2026 movie title best describes the stock market?", a: ["Everything Everywhere All At Once", "The Big Short 2", "Inception (Confusing)", "The Quiet Place"], c: 0 },
+        { q: "Your startup is 'Mid.' What does that mean?", a: ["It's average/boring", "It's in the middle of a deal", "It's high quality", "It's from the Midwest"], c: 0 },
+        { q: "What is 'Fin-fluencing'?", a: ["Giving financial advice on social media", "Influencing people to be thin", "A new type of flu", "Fishing for money"], c: 0 },
+        { q: "If your CEO is 'Capping,' what is he doing?", a: ["Lying about revenue", "Wearing a hat", "Setting a limit", "Investing in lids"], c: 0 },
+        { q: "Your startup has 'Rizz.' Investors are:", a: ["Attracted and interested", "Confused", "Angry", "Ghosting you"], c: 0 },
+        { q: "What is 'Stealth Wealth'?", a: ["Being rich but looking poor", "Being a ninja", "Stolen money", "A video game"], c: 0 },
+        { q: "You are 'Standing on Business.' What does this mean?", a: ["Taking things seriously and winning", "Standing on your office building", "Waiting for a bus", "Being a landlord"], c: 0 },
+        { q: "What is 'Coffee Badging'?", a: ["Going to the office just for coffee", "Collecting coffee cups", "A new crypto coin", "A barista certification"], c: 0 },
+        { q: "If a deal is 'Very Demure,' it is:", a: ["Modest and respectful", "Loud and crazy", "A scam", "Expensive"], c: 0 },
+        { q: "Fastest way to become a millionaire?", a: ["Start as a billionaire and buy a startup", "Work 100 hours a week", "Win the lottery", "Ask your dad"], c: 0 },
+        { q: "A 'Zombie Company' is:", a: ["A company that earns just enough to survive", "A company that sells brains", "A dead startup", "A horror movie studio"], c: 0 },
+        { q: "What is 'FOMO'?", a: ["Fear of Missing Out", "Full of Money Only", "Finding Other Mothers", "Fast On My Own"], c: 0 },
+        { q: "If you 'Buy High and Sell Low,' you are:", a: ["Doing it wrong (The Meme Strategy)", "A genius", "A professional trader", "A Shark"], c: 0 },
+        { q: "What is a 'Paper Millionaire'?", a: ["Wealth that's only on paper", "Someone who makes paper", "A rich author", "A fake rich person"], c: 0 },
+        { q: "What is 'Clawback'?", a: ["Taking back money already paid", "A cat attack", "A gym exercise", "A discount"], c: 0 },
+        { q: "A 'Golden Handshake' is:", a: ["A large payment for leaving a company", "A statue", "A magic trick", "A firm grip"], c: 0 },
+        { q: "What is 'Insider Trading'?", a: ["Illegal trading based on secret info", "Trading inside a room", "Selling your furniture", "Buying lunch for the office"], c: 0 },
+        { q: "What is a 'Haircut' in finance?", a: ["A reduction in the value of an asset", "A new style", "A barbershop startup", "A tax break"], c: 0 },
+        { q: "What is 'Dead Cat Bounce'?", a: ["A temporary recovery in a falling market", "A zombie movie", "Cruelty", "A trampoline brand"], c: 0 },
+        { q: "What is the 'Rule of 72'?", a: ["A way to estimate doubling your money", "A rule for dating", "The number of hours in a weekend", "A law of physics"], c: 0 },
+        { q: "What is a 'Pink Sheet'?", a: ["A list of low-value stocks", "A bed sheet", "A love letter", "A pink-colored balance sheet"], c: 0 },
+        { q: "What is 'Arbitrage'?", a: ["Buying low in one market and selling high in another", "A type of cheese", "A legal argument", "A startup hub"], c: 0 },
+        { q: "What is a 'Hedge'?", a: ["An investment to reduce risk", "A bush in your garden", "A wall", "A small animal"], c: 0 },
+        { q: "What is 'Leverage'?", a: ["Using borrowed money to invest", "Hiring a strong person", "A crowbar", "A promotion"], c: 0 },
+        { q: "What is 'EBITDA'?", a: ["Earnings before interest, taxes, etc.", "A Swedish band", "A type of pasta", "An African drum"], c: 0 },
+        { q: "What is 'Market Cap'?", a: ["Total value of a company's shares", "A hat for traders", "A limit on sales", "A grocery store"], c: 0 },
+        { q: "What is 'DCA' (Dollar Cost Averaging)?", a: ["Investing a fixed amount regularly", "Buying everything at once", "An airport code", "A new dance move"], c: 0 },
+        { q: "What is a 'Lame Duck'?", a: ["An official nearing the end of their term", "An injured bird", "A failed startup", "A boring investor"], c: 0 },
+        { q: "Final Question: What is the secret to winning the Finance Carnival?", a: ["All of the above", "Luck", "Reading the questions", "Having 'Aura'"], c: 0 }
+    ];
+
+    let sessionPool = [];
+    let currentIdx = 0;
+    let userChoices = [];
+
+    function init() {
+        // Randomly slice 10 from the fully mapped 100 question database
+        sessionPool = database.sort(() => Math.random() - 0.5).slice(0, 10);
+        userChoices = new Array(10).fill(null);
+        render();
+    }
+
+    function render() {
+        const item = sessionPool[currentIdx];
+        document.getElementById('q-num').innerText = currentIdx + 1;
+        document.getElementById('q-text').innerText = item.q;
+        
+        const box = document.getElementById('options');
+        box.innerHTML = '';
+        item.a.forEach((txt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn' + (userChoices[currentIdx] === i ? ' selected' : '');
+            btn.innerText = txt;
+            btn.onclick = () => {
+                userChoices[currentIdx] = i;
+                render();
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function nextQ() {
+        // Ensure user actually selected an option
+        if (userChoices[currentIdx] === null) {
+            alert("Pick an option before continuing the Carnival!");
+            return;
+        }
+
+        if (currentIdx < 9) {
+            currentIdx++;
+            render();
+            if (currentIdx === 9) {
+                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('submit-btn').style.display = 'inline-block';
+            }
+        }
+    }
+
+    function calculateResults() {
+        if (userChoices[9] === null) {
+            alert("Pick the final option before submitting!");
+            return;
+        }
+
+        let score = 0;
+        sessionPool.forEach((q, i) => {
+            if (userChoices[i] === q.c) score++;
+        });
+
+        // The math logic you requested: 5% off for every 2 correct answers
+        const discount = Math.floor(score / 2) * 5;
+        
+        document.getElementById('score-text').innerText = score;
+        document.getElementById('discount-text').innerText = `${discount}% OFF`;
+        
+        // Prepare the "Indirect" Review Section
+        const reviewBox = document.getElementById('review-box');
+        reviewBox.innerHTML = '';
+        sessionPool.forEach((q, i) => {
+            const isCorrect = userChoices[i] === q.c;
+            const div = document.createElement('div');
+            div.className = `review-item ${isCorrect ? 'correct' : 'wrong'}`;
+            div.innerHTML = `
+                <strong>${i+1}. ${q.q}</strong><br>
+                <div style="margin-top: 8px;">
+                    Your Answer: <span class="user-ans" style="color: ${isCorrect ? '#27ae60' : '#e74c3c'}">${q.a[userChoices[i]]}</span><br>
+                    Correct Answer: <span class="correct-ans">${q.a[q.c]}</span>
+                </div>`;
+            reviewBox.appendChild(div);
+        });
+
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+    }
+
+    function toggleReview() {
+        const box = document.getElementById('review-box');
+        box.style.display = (box.style.display === 'block' ? 'none' : 'block');
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
