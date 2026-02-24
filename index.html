@@ -286,11 +286,11 @@
             if (userChoices[i] === q.c) score++;
         });
 
-        // The math logic you requested: 5% off for every 2 correct answers
+        // The math logic you requested: Rs 5 off for every 2 correct answers
         const discount = Math.floor(score / 2) * 5;
         
         document.getElementById('score-text').innerText = score;
-        document.getElementById('discount-text').innerText = `${discount}% OFF`;
+        document.getElementById('discount-text').innerText = `Rs. ${discount} OFF`;
         
         // Prepare the "Indirect" Review Section
         const reviewBox = document.getElementById('review-box');
